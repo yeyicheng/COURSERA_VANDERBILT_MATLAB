@@ -1,4 +1,4 @@
-function [ p, AA ] = maxproduct( A, n )
+function [ p ] = maxproduct( A, n )
     [r, c] = size(A);
     maxim = zeros(1, 4) - inf;
     indices = {};
@@ -22,17 +22,21 @@ function [ p, AA ] = maxproduct( A, n )
             end
         end
     end
-   
+    
     if c == 1 || r == 1
         if n == 1
             [maxim(3), Id] = max(A(:));
+            [maxim(4), Id] = max(A(:));
             if c == 1
                 indices{3} = [Id, 1];
+                indices{4} = [Id, 1];
             else
                 indices{3} = [1,Id];
+                indices{4} = [1,Id];
             end
         else
             indices{3} = [];
+            indices{4} = [];
         end
     else
         for diag_dim = -r+1:c-1
@@ -49,40 +53,24 @@ function [ p, AA ] = maxproduct( A, n )
                 end
             end
         end
-    end
-    
-    if c == 1 || r == 1
-        if n == 1
-            [maxim(4), Id] = max(A(:));
-            if c == 1
-                indices{4} = [Id, 1];
-            else
-                indices{4} = [1,Id];
-            end
-        else
-            indices{4} = [];
-        end
-    else
+
         for diag_dim = -r+1:c-1
-            reverse_diags = diag(flip(A), diag_dim)'
-            reverse_diags = reverse_diags(end:-1:1);
+            reverse_diags = diag(flipud(A), diag_dim)';
             len_rev_diag = length(reverse_diags);
             for j = 1 : len_rev_diag - n + 1
                 pp = prod(reverse_diags(1, j : j + n - 1));
                 if pp > maxim(4)
                     maxim(4) = pp;
                     if diag_dim >= 0
-                        indices{3} = [(j: j + n - 1)' (j + diag_dim:j + n - 1 + diag_dim)'];
+                        indices{4} = [(r + 1 - j - n + 1 : r - j + 1  )' (j + diag_dim + n - 1 : -1 :diag_dim + j)'];
                     else
-                        indices{3} = [(j - diag_dim:j + n - 1 - diag_dim)' (j:j + n - 1)'];
+                        indices{4} = [(r + 1 + diag_dim - j - n + 1 : r + 1 + diag_dim - j)' (j + n - 1 : -1 : j)' ];
                     end
-                    indices{4} = [(j:j + n - 1)' (len_rev_diag + 1 - j: -1: len_rev_diag + 1 - j - n + 1)'];
                 end
             end
         end
     end
     
-    maxim
     [ m, I ] = max(maxim);
 
     if I > length(indices)
