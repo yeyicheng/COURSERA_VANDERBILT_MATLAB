@@ -12,8 +12,6 @@ function [ cent ] = centuries( year )
    else
        cent = '';
    end
-   for i = 1:floor(cent_num / 10)
-       cent = strcat('X', cent);
-   end
+   cent = strcat(char(zeros(1, floor(cent_num / 10)) + 'X'), cent);
 end
 
